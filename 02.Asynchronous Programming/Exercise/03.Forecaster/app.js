@@ -3,9 +3,6 @@ function attachEvents() {
 }
 
 async function getForecast() {
-    const divForecast = document.getElementById('forecast');
-    divForecast.style.display = '';
-
     const weatherSymbols = {
         'Sunny': '&#x2600',
         'Partly sunny': '&#x26C5',
@@ -14,8 +11,17 @@ async function getForecast() {
         'Degrees': '&#176'
     }
 
-    const divCurrent = document.querySelector('#current .label');
-    const divUpcoming = document.querySelector('#upcoming .label');
+    const divForecast = document.getElementById('forecast');
+    divForecast.style.display = '';
+    divForecast.innerHTML = '';
+
+    const divCurrent = document.createElement('div');
+    divCurrent.id = 'current';
+    divCurrent.innerHTML = '<div class="label">Current conditions</div>';
+
+    const divUpcoming = document.createElement('div');
+    divUpcoming.id = 'upcoming';
+    divUpcoming.innerHTML = '<div class="label">Three-day forecast</div>';
 
     try {
         const code = await getLocationCode(document.getElementById('location').value);
@@ -24,6 +30,35 @@ async function getForecast() {
             getCurrentForecast(code),
             getUpcomingForecast(code)
         ]);
+
+        const divCurrentForecast = document.createElement('div');
+        divCurrentForecast.classList.add('forecasts');
+        divCurrentForecast.innerHTML = `<span class="condition symbol">${weatherSymbols[current.forecast.condition]}</span>
+                                        <span class="condition">
+                                        <span class="forecast-data">${current.name}</span>
+                                        <span class="forecast-data">${current.forecast.low}${weatherSymbols.Degrees}/${current.forecast.high}${weatherSymbols.Degrees}</span>
+                                        <span class="forecast-data">${current.forecast.condition}</span>
+                                        </span>`;
+
+        divCurrent.appendChild(divCurrentForecast);
+
+        const divUpcomingForecast = document.createElement('div');
+        divUpcomingForecast.classList.add('forecast-info');
+
+        upcoming.forecast.forEach(x => {
+            const span = document.createElement('span');
+            span.classList.add('upcoming');
+            span.innerHTML = `<span class="symbol">${weatherSymbols[x.condition]}</span>
+                              <span class="forecast-data">${x.low}${weatherSymbols.Degrees}/${x.high}${weatherSymbols.Degrees}</span>
+                              <span class="forecast-data">${x.condition}</span>`;
+
+            divUpcomingForecast.appendChild(span);
+        });
+
+        divUpcoming.appendChild(divUpcomingForecast);
+
+        divForecast.appendChild(divCurrent);
+        divForecast.appendChild(divUpcoming);
     }
     catch (error) {
         divForecast.textContent = error.message;
@@ -63,7 +98,7 @@ async function getLocationCode(name) {
         throw new Error('Error');
     }
 
-    console.log(location)
+    return location.code;
 }
 
 attachEvents();
