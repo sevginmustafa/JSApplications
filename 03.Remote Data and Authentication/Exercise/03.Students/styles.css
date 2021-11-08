@@ -17,7 +17,7 @@ table{
 }
 table th{
     text-decoration: underline;
-    text-align: center;
+    text-align: left;
 }
 table tbody td{
     text-align: left;
