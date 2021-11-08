@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,10 @@
     <title>Books</title>
     <link rel="stylesheet" href="./styles.css">
 </head>
+
 <body>
     <button id="loadBooks">LOAD ALL BOOKS</button>
-    <table>
+    <table id="books">
         <thead>
             <tr>
                 <th>Title</th>
@@ -37,16 +39,25 @@
         </tbody>
     </table>
 
-    <form>
-        <h3>FORM</h3>
+    <form id="createForm">
+        <h3>CREATE FORM</h3>
         <label>TITLE</label>
         <input type="text" name="title" placeholder="Title...">
         <label>AUTHOR</label>
         <input type="text" name="author" placeholder="Author...">
         <button>Submit</button>
     </form>
+    <form id="editForm">
+        <h3>EDIT FORM</h3>
+        <label>TITLE</label>
+        <input type="text" name="title" placeholder="Title...">
+        <label>AUTHOR</label>
+        <input type="text" name="author" placeholder="Author...">
+        <button>Save</button>
+    </form>
     <script src="./app.js"></script>
 </body>
+
 </html>
 
 <!--Feel free to change/update/modify the HTML Structure-->
