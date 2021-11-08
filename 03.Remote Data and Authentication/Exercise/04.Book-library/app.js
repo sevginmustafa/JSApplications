@@ -1,6 +1,7 @@
 window.addEventListener('load', () => {
     document.getElementById('loadBooks').addEventListener('click', loadAllBooks);
     createForm.addEventListener('submit', onSubmitCreate);
+    editForm.addEventListener('submit', onSubmitEdit);
     editForm.style.display = 'none';
 
     loadAllBooks();
@@ -61,30 +62,82 @@ async function onSubmitCreate(ev) {
     }
 }
 
-async function editBook(id) {
+async function editBook(id, book) {
+    if (Object.values(book).some(x => x == '')) {
+        throw new Error('All fields are required!');
+    }
 
+    const result = await request('http://localhost:3030/jsonstore/collections/books/' + id, {
+        method: 'put',
+        body: JSON.stringify(book)
+    });
+
+    return result;
 }
 
 async function onEdit(button) {
     const id = button.parentElement.dataset.id;
     const book = await getBookById(id);
 
-    console.log(book);
+    createForm.style.display = 'none';
+    editForm.style.display = '';
+
+    editForm.querySelector('[name="id"]').value = id;
+    editForm.querySelector('[name="title"]').value = book.title;
+    editForm.querySelector('[name="author"]').value = book.author;
+}
+
+async function onSubmitEdit(ev) {
+    ev.preventDefault();
+
+    const formData = new FormData(ev.target);
+
+    const id = formData.get('id');
+    const title = formData.get('title');
+    const author = formData.get('author');
+
+    try {
+        const result = await editBook(id, { title, author });
+
+        ev.target.reset();
+
+        createForm.style.display = '';
+        editForm.style.display = 'none';
+
+        loadAllBooks();
+    }
+    catch (error) {
+        alert(error.message);
+    }
+}
+
+async function deleteBook(id) {
+    const result = await request('http://localhost:3030/jsonstore/collections/books/' + id, {
+        method: 'delete',
+    });
+
+    return result;
+}
+
+async function onDelete(button) {
+    const id = button.parentElement.dataset.id;
+
+    await deleteBook(id);
+
+    button.parentElement.parentElement.remove();
 }
 
 function onTableClick(ev) {
     if (ev.target.className == 'edit') {
-        createForm.style.display = 'none';
-        editForm.style.display = '';
         onEdit(ev.target);
     }
     else if (ev.target.className == 'delete') {
-        console.log('delete')
+        onDelete(ev.target);
     }
 }
 
 async function getBookById(id) {
-    const result = await request('http://localhost:3030/jsonstore/collections/books' + id);
+    const result = await request('http://localhost:3030/jsonstore/collections/books/' + id);
 
     return result;
 }
@@ -94,7 +147,7 @@ function createItem(book) {
 
     tr.innerHTML = `<td>${book.title}</td>
                     <td>${book.author}</td>
-                    <td data-id=${book._id}">
+                    <td data-id="${book._id}">
                         <button class="edit">Edit</button>
                         <button class="delete">Delete</button>
                     </td>`;
