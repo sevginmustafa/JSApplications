@@ -23,77 +23,6 @@ window.addEventListener('load', () => {
 const catches = document.getElementById('catches');
 catches.addEventListener('click', onClick)
 
-function onClick(ev) {
-    if (ev.target.className == 'delete') {
-        onDelete(ev.target);
-    }
-    else if (ev.target.className == 'update') {
-        console.log('clicked update')
-    }
-}
-
-async function onDelete(button) {
-    const id = button.dataset.id;
-
-    await deleteCatch(id);
-
-    button.parentNode.remove();
-}
-
-async function deleteCatch(id) {
-    const url = 'http://localhost:3030/data/catches/' + id;
-
-    try {
-        const response = await fetch(url, {
-            method: 'delete',
-            headers: {
-                'X-Authorization': userData.token
-            }
-        });
-
-        if (response.ok != true) {
-            const error = await response.json();
-            throw new Error(error.message);
-        }
-    }
-    catch (error) {
-        alert(error.message);
-    }
-
-    const result = respone.json();
-
-    return result;
-}
-
-async function onLogout() {
-    if (!userData) {
-        window.location = '/index.html';
-        return;
-    }
-
-    const response = await fetch('http://localhost:3030/users/logout', {
-        method: 'get',
-        headers: {
-            'X-Authorization': userData.token
-        },
-    });
-
-    if (response.ok) {
-        sessionStorage.clear();
-        window.location = '/index.html';
-    }
-}
-
-async function loadData() {
-    const url = 'http://localhost:3030/data/catches';
-
-    const response = await fetch(url);
-
-    const data = await response.json();
-
-    catches.replaceChildren(...data.map(createItem));
-}
-
 async function onCreateSubmit(ev) {
     ev.preventDefault();
 
@@ -132,6 +61,123 @@ async function onCreateSubmit(ev) {
     }
 }
 
+async function onEdit(button) {
+    const id = button.dataset.id;
+    const div = button.parentNode;
+    const inputs = div.querySelectorAll('input');
+
+    const data = {
+        'angler': inputs[0].value,
+        'weight': inputs[1].value,
+        'species': inputs[2].value,
+        'location': inputs[3].value,
+        'bait': inputs[4].value,
+        'captureTime': inputs[5].value,
+    };
+
+    const result = await editEntry(id, data);
+
+    div.replaceWith(createItem(result));
+}
+
+async function editEntry(id, data) {
+    const url = 'http://localhost:3030/data/catches/' + id;
+
+    try {
+        if (Object.values(data).some(x => x == '')) {
+            throw new Error('All fields are required!');
+        }
+
+        const response = await fetch(url, {
+            method: 'put',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Authorization': userData.token
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok != true) {
+            const error = await response.json();
+            throw new Error(error.message);
+        }
+
+        const result = await response.json();
+
+        return result;
+    }
+    catch (error) {
+        alert(error.message);
+    }
+}
+
+async function onDelete(button) {
+    const id = button.dataset.id;
+
+    await deleteEntry(id);
+
+    button.parentNode.remove();
+}
+
+async function deleteEntry(id) {
+    const url = 'http://localhost:3030/data/catches/' + id;
+
+    try {
+        const response = await fetch(url, {
+            method: 'delete',
+            headers: {
+                'X-Authorization': userData.token
+            }
+        });
+
+        if (response.ok != true) {
+            const error = await response.json();
+            throw new Error(error.message);
+        }
+    }
+    catch (error) {
+        alert(error.message);
+    }
+}
+
+async function loadData() {
+    const url = 'http://localhost:3030/data/catches';
+
+    const response = await fetch(url);
+
+    const data = await response.json();
+
+    catches.replaceChildren(...data.map(createItem));
+}
+
+async function onLogout() {
+    if (!userData) {
+        window.location = '/index.html';
+        return;
+    }
+
+    const response = await fetch('http://localhost:3030/users/logout', {
+        method: 'get',
+        headers: {
+            'X-Authorization': userData.token
+        },
+    });
+
+    if (response.ok) {
+        sessionStorage.clear();
+        window.location = '/index.html';
+    }
+}
+
+function onClick(ev) {
+    if (ev.target.className == 'delete') {
+        onDelete(ev.target);
+    }
+    else if (ev.target.className == 'update') {
+        onEdit(ev.target);
+    }
+}
+
 function createItem(data) {
     const isOwner = userData && data._ownerId == userData.id;
 
@@ -140,7 +186,7 @@ function createItem(data) {
     div.innerHTML = `<label>Angler</label>
                     <input type="text" class="angler" value="${data.angler}" ${!isOwner ? 'disabled' : ''}>
                     <label>Weight</label>
-                    <input type="text" class="weight" value="${data.weight}" ${!isOwner ? 'disabled' : ''}>
+                    <input type="text" class="" value="${data.weight}" ${!isOwner ? 'disabled' : ''}>
                     <label>Species</label>
                     <input type="text" class="species" value="${data.species}" ${!isOwner ? 'disabled' : ''}>
                     <label>Location</label>
