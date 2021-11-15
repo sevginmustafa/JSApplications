@@ -39,3 +39,11 @@
     text-decoration: underline;
     box-shadow: 0 5px 10px #cccccc;
 }
+
+#views {
+    display: none;
+}
+
+.user, .guest {
+    display: none;
+}
