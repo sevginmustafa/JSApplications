@@ -25,8 +25,8 @@ catalog.addEventListener('click', (event) => {
 
 export function showHome() {
     showView(section);
-    getMovies();
     updateNav();
+    getMovies();
 }
 
 async function getMovies() {

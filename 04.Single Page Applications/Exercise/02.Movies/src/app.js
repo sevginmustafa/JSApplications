@@ -33,10 +33,12 @@ export function updateNav() {
         [...nav.querySelectorAll('.user')].forEach(x => x.style.display = 'inline-block');
         [...nav.querySelectorAll('.guest')].forEach(x => x.style.display = 'none');
         document.getElementById('welcomeMsg').textContent = `Welcome, ${userData.email}`;
+        document.getElementById('add-movie-button').style.display = 'block';
     }
     else {
         [...nav.querySelectorAll('.user')].forEach(x => x.style.display = 'none');
         [...nav.querySelectorAll('.guest')].forEach(x => x.style.display = 'inline-block');
+        document.getElementById('add-movie-button').style.display = 'none';
     }
 }
 

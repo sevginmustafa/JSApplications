@@ -29,13 +29,15 @@ form.querySelector('.cancel').addEventListener('click', onCancel);
 getPosts();
 
 async function onTopicClick(ev) {
+    ev.preventDefault();
     const element = ev.target;
 
     if (element.tagName == 'H2') {
         showDetails();
         const id = element.parentElement.dataset.id;
         await getPostById(id);
-        document.querySelector('.answer-comment button').addEventListener('click', async (event) => createComment(event,id));
+        document.querySelector('.answer-comment button')
+            .addEventListener('click', async (event) => createComment(event, id));
     }
 }
 
@@ -119,7 +121,7 @@ async function getCurrentTopicComments(id) {
     return Object.values(data).filter(x => x.topicId == id);
 }
 
-async function createComment(ev,topicId) {
+async function createComment(ev, topicId) {
     ev.preventDefault();
     const commentForm = document.querySelector('.answer-comment form');
 

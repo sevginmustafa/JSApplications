@@ -1,3 +1,4 @@
+import { updateNav } from "./app.js";
 import { showView } from "./dom.js";
 import { showHome } from "./home.js";
 

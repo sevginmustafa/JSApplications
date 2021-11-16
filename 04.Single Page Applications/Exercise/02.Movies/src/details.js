@@ -1,4 +1,6 @@
 import { showView } from "./dom.js";
+import { fillEditForm, showEdit } from "./edit.js";
+import { showHome } from "./home.js";
 
 const section = document.getElementById('movie-example');
 section.remove();
@@ -37,8 +39,8 @@ function createDetails(movie, likes, hasLiked) {
 
     if (userData) {
         if (userData.id == movie._ownerId) {
-            html = `<a class="btn btn-danger" href="#">Delete</a>
-                    <a class="btn btn-warning" href="#">Edit</a>`;
+            html = `<a id="deleteBtn" data-id="${movie._id}" class="btn btn-danger" href="#">Delete</a>
+                    <a id="editLink" class="btn btn-warning" href="#">Edit</a>`;
         }
         else {
             if (hasLiked.length > 0) {
@@ -68,6 +70,8 @@ function createDetails(movie, likes, hasLiked) {
 
     const likeBtn = div.querySelector('#likeLink');
     const unlikeBtn = div.querySelector('#unlikeLink');
+    const editBtn = div.querySelector('#editLink');
+    const deleteBtn = div.querySelector('#deleteBtn');
 
     if (likeBtn) {
         likeBtn.addEventListener('click', onLike);
@@ -75,9 +79,14 @@ function createDetails(movie, likes, hasLiked) {
     if (unlikeBtn) {
         unlikeBtn.addEventListener('click', onUnlike);
     }
+    if (editBtn) {
+        editBtn.addEventListener('click', onEdit);
+    }
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', onDelete);
+    }
 
     return div;
-
 
     async function onLike() {
         const url = 'http://localhost:3030/data/likes';
@@ -109,5 +118,36 @@ function createDetails(movie, likes, hasLiked) {
         });
 
         showDetails(movie._id);
+    }
+
+    async function onEdit() {
+        showEdit();
+        document.getElementById('edit-movie').dataset.id = movie._id;
+        await fillEditForm();
+    }
+
+    async function onDelete(event) {
+        const id = event.target.dataset.id;
+
+        const url = 'http://localhost:3030/data/movies/' + id;
+
+        try {
+            const res = await fetch(url, {
+                method: 'delete',
+                headers: {
+                    'X-Authorization': userData.token
+                }
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.message);
+            }
+
+            showHome();
+        }
+        catch (error) {
+            alert(error.message);
+        }
     }
 }
