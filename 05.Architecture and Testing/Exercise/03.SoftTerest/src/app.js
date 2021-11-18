@@ -1,3 +1,4 @@
+import { logout } from "./api/data.js";
 import { showHomePage } from "./home.js";
 import { showCatalogPage } from "./catalog.js";
 import { showCreatePage } from "./create.js";
@@ -32,6 +33,13 @@ const ctx = {
 
 const nav = document.querySelector('nav');
 nav.addEventListener('click', onNavigate);
+
+document.getElementById('logoutBtn').addEventListener('click', async (event) => {
+    event.preventDefault();
+    await logout();
+    goTo('home');
+    updateNav();
+})
 
 goTo('home');
 updateNav();

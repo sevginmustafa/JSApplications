@@ -1,9 +1,14 @@
+import { logout } from "./api/api.js";
 import { getById } from "./api/data.js";
+import { deleteById } from "./api/data.js";
 
 const section = document.getElementById('detailsPage');
 section.remove;
 
-export async function showDetailsPage(ctx, id) {
+let ctx = null;
+
+export async function showDetailsPage(ctxTarget, id) {
+    ctx = ctxTarget;
     ctx.showSection(section);
     loadIdea(id);
 }
@@ -35,5 +40,22 @@ function createIdeaDetails(idea) {
                             ${html}
                         </div>`;
 
+    const deleteBtn = template.content.querySelector('.btn.detb');
+
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', onDelete);
+    }
+
     return template.content;
+
+    async function onDelete(event) {
+        event.preventDefault();
+
+        const confirmed = confirm('Are you sure you want to delete this idea?');
+
+        if (confirmed) {
+            await deleteById(idea._id);
+            ctx.goTo('catalog');
+        }
+    }
 }
