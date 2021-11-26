@@ -14,16 +14,16 @@ const template = (onRegister, errorMsg, errors) => html`
             ${errorMsg ? html`<div class="form-group error">${errorMsg}</div>` : null}
             <div class="form-group">
                 <label class="form-control-label" for="email">Email</label>
-                <input class="form-control ${errors.email ? 'is-invalid' : ''}" id="email" type="text" name="email">
+                <input class="form-control ${errors.email ? 'is-invalid' : 'is-valid'}" id="email" type="text" name="email">
             </div>
             <div class="form-group">
                 <label class="form-control-label" for="password">Password</label>
-                <input class="form-control ${errors.password ? 'is-invalid' : ''}" id="password" type="password"
+                <input class="form-control ${errors.password ? 'is-invalid' : 'is-valid'}" id="password" type="password"
                     name="password">
             </div>
             <div class="form-group">
                 <label class="form-control-label" for="rePass">Repeat</label>
-                <input class="form-control ${errors.rePass ? 'is-invalid' : ''}" id="rePass" type="password"
+                <input class="form-control ${errors.rePass ? 'is-invalid' : 'is-valid'}" id="rePass" type="password"
                     name="rePass">
             </div>
             <input type="submit" class="btn btn-primary" value="Register" />
