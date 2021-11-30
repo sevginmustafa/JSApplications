@@ -30,7 +30,7 @@ async function decorateContext(ctx, next) {
     next();
 }
 
-function updateUserNav(userId) {
+function updateUserNav() {
     const userData = getUserData();
 
     if (userData) {
