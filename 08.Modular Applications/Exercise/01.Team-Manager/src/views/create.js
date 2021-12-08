@@ -33,13 +33,6 @@ export function createPage(ctx) {
         const name = formData.get('name').trim();
         const logoUrl = formData.get('logoUrl').trim();
         const description = formData.get('description').trim();
-
-        const team = {
-            name,
-            logoUrl,
-            description
-        };
-
         try {
             if (name == '' || logoUrl == '' || description == '') {
                 throw new Error('All fields are required!');
@@ -53,6 +46,12 @@ export function createPage(ctx) {
                 throw new Error('Description must be at least 10 characters long!');
             }
 
+            const team = {
+                name,
+                logoUrl,
+                description
+            };
+    
             await createTeam(team);
             ctx.page.redirect('/details');
             ctx.updateUserNav();

@@ -1,13 +1,14 @@
+import { getTeamById, getTeamMembers, getTeamMemberships } from '../api/data.js';
 import { html } from '../lib.js';
 
-const template = () => html`
+const template = (team, membershipRequests) => html`
 <section id="team-home">
     <article class="layout">
-        <img src="./assets/rocket.png" class="team-logo left-col">
+        <img src="${team.logoUrl}" class="team-logo left-col">
         <div class="tm-preview">
-            <h2>Team Rocket</h2>
-            <p>Gotta catch 'em all!</p>
-            <span class="details">3 Members</span>
+            <h2>${team.name}</h2>
+            <p>${team.description}</p>
+            <span class="details">${team.membersCount} Members</span>
             <div>
                 <a href="#" class="action">Edit team</a>
                 <a href="#" class="action">Join team</a>
@@ -26,16 +27,33 @@ const template = () => html`
         <div class="pad-large">
             <h3>Membership Requests</h3>
             <ul class="tm-members">
-                <li>John<a href="#" class="tm-control action">Approve</a><a href="#"
-                        class="tm-control action">Decline</a></li>
-                <li>Preya<a href="#" class="tm-control action">Approve</a><a href="#"
-                        class="tm-control action">Decline</a></li>
+                ${membershipRequests.map(membershipCard)}
             </ul>
         </div>
     </article>
 </section>
 `;
 
-export function detailsPage(ctx) {
-    ctx.render(template());
+const memberCard = (membership) => html`
+<li>James
+    <a href="#" class="tm-control action">Remove from team</a>
+</li>`;
+
+const membershipCard = (membership) => html`
+<li>John
+    <a href="#" class="tm-control action">Approve</a>
+    <a href="#" class="tm-control action">Decline</a>
+</li>`;
+
+export async function detailsPage(ctx) {
+    const teamId = ctx.params.id;
+    const team = await getTeamById(teamId);
+    const allMembers = await getTeamMembers(team._id);
+    
+    const members
+
+    const membershipRequests = await getTeamMemberships(teamId);
+    console.log(membershipRequests)
+
+    ctx.render(template(team, membershipRequests));
 }

@@ -22,7 +22,7 @@ const teamCard = (team) => html`
     <div class="tm-preview">
         <h2>${team.name}</h2>
         <p>${team.description}</p>
-        <span @onload=${(event)=> loadMemberCounts(event, team._id)} class="details">Members</span>
+        <span class="details">${team.membersCount} Members</span>
         <div><a href="/details/${team._id}" class="action">See details</a></div>
     </div>
 </article>
@@ -36,11 +36,10 @@ export function browsePage(ctx) {
 async function loadTeams() {
     const teams = await getAllTeams();
 
+    for (let team of teams) {
+        const members = await getTeamMembers(team._id);
+        team['membersCount'] = members.length;
+    }
+
     return teams.map(teamCard);
-}
-
-async function loadMemberCounts(event, teamId) {
-    const count = await getTeamMembers().length;
-
-    console.log(event.target)
 }
