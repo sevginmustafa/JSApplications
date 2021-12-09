@@ -18,7 +18,7 @@ page('/', homePage);
 page('/login', loginPage);
 page('/register', registerPage);
 page('/create', createPage);
-page('/edit', editPage);
+page('/edit/:id', editPage);
 page('/details/:id', detailsPage);
 page('/browse', browsePage);
 page('/my-teams', myTeamsPage);
@@ -34,7 +34,7 @@ function decorateContext(ctx, next) {
     next();
 }
 
-async function onLogout(){
+async function onLogout() {
     await logout();
     page.redirect('/');
 }

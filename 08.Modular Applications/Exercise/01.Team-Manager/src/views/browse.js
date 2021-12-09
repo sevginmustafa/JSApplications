@@ -1,4 +1,4 @@
-import { getAllTeams, getTeamMembers } from '../api/data.js';
+import { getAllTeams, getTeamMemberships } from '../api/data.js';
 import { html, until } from '../lib.js';
 
 const template = (teamPromise) => html`
@@ -37,7 +37,7 @@ async function loadTeams() {
     const teams = await getAllTeams();
 
     for (let team of teams) {
-        const members = await getTeamMembers(team._id);
+        const members = await getTeamMemberships(team._id);
         team['membersCount'] = members.length;
     }
 
