@@ -1,4 +1,4 @@
-import { createTeam } from '../api/data.js';
+import { approveMembershipRequest, createTeam, sendMembershipRequest } from '../api/data.js';
 import { html } from '../lib.js';
 
 const template = (onSubmit, errorMsg) => html`
@@ -51,9 +51,18 @@ export function createPage(ctx) {
                 logoUrl,
                 description
             };
-    
-            await createTeam(team);
-            ctx.page.redirect('/details');
+
+            const response = await createTeam(team);
+
+            const teamId = response._id;
+
+            const membershipRequest = await sendMembershipRequest({ teamId });
+
+            membershipRequest.status = 'member';
+
+            await approveMembershipRequest(membershipRequest._id, membershipRequest);
+
+            ctx.page.redirect('/details/' + teamId);
             ctx.updateUserNav();
         }
         catch (error) {

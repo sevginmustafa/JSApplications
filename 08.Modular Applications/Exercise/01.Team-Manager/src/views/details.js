@@ -1,8 +1,8 @@
-import { cancelMembershipRequest, getTeamById, getTeamMemberships, sendMembershipRequest } from '../api/data.js';
+import { approveMembershipRequest, cancelMembershipRequest, getTeamById, getTeamMemberships, sendMembershipRequest } from '../api/data.js';
 import { html } from '../lib.js';
 import { getUserData } from '../util.js';
 
-const template = (team, isOwner, isMember, isPending, members, pendings, onRequest, onCancel) => html`
+const template = (team, isOwner, isMember, isPending, members, pendings, onRequest, onCancel, onApprove, onDecline) => html`
 <section id="team-home">
     <article class="layout">
         <img src="${team.logoUrl}" class="team-logo left-col">
@@ -11,9 +11,9 @@ const template = (team, isOwner, isMember, isPending, members, pendings, onReque
             <p>${team.description}</p>
             <span class="details">${team.membersCount} Members</span>
             <div>
-                ${isOwner ? html`<a href="#" class="action">Edit team</a>` : html`${isMember ? html`<a href="#"
-                    class="action invert">Leave team</a>` : html` ${!getUserData() ? null : html`${!isPending ? html`<a
-                    @click=${onRequest} href="#" class="action"> Join
+                ${isOwner ? html`<a href="/edit/${team._id}" class="action">Edit team</a>` : html`${isMember ?
+                html`<a href="#" class="action invert">Leave team</a>` : html` ${!getUserData() ? null :
+                html`${!isPending ? html`<a @click=${onRequest} href="#" class="action"> Join
                     team</a>` : html`Membership pending. <a @click=${onCancel} href="#"> Cancel request</a>`}`}`}`}
             </div>
         </div>
@@ -27,7 +27,7 @@ const template = (team, isOwner, isMember, isPending, members, pendings, onReque
         <div class="pad-large">
             <h3>Membership Requests</h3>
             <ul class="tm-members">
-                ${pendings.map(x => pendingCard(x, isOwner))}
+                ${pendings.map(x => pendingCard(x, onApprove, onDecline))}
             </ul>
         </div>`: null}
 
@@ -37,13 +37,14 @@ const template = (team, isOwner, isMember, isPending, members, pendings, onReque
 
 const memberCard = (member, isOwner) => html`
 <li>${member.user.username}
-    ${isOwner ? html`<a href="#" class="tm-control action">Remove from team</a>` : null}
+    ${isOwner && getUserData().username != member.user.username ? html`<a href="#" class="tm-control action">Remove from
+        team</a>` : null}
 </li>`;
 
-const pendingCard = (pending) => html`
-<li>${pending.user.username}
-    <a href="#" class="tm-control action">Approve</a>
-    <a href="#" class="tm-control action">Decline</a>
+const pendingCard = (pending, onApprove, onDecline) => html`
+<li data-id="${pending._id}">${pending.user.username}
+    <a @click="${onApprove}" href="#" class="tm-control action">Approve</a>
+    <a @click=${onDecline} href="#" class="tm-control action">Decline</a>
 </li>`;
 
 export async function detailsPage(ctx) {
@@ -61,10 +62,8 @@ export async function detailsPage(ctx) {
     const isPending = userData && pendings.some(x => x._ownerId == userData.id);
 
     team['membersCount'] = members.length;
-
-    console.log(pendings)
-
-    ctx.render(template(team, isOwner, isMember, isPending, members, pendings, onRequest, onCancel));
+    
+    ctx.render(template(team, isOwner, isMember, isPending, members, pendings, onRequest, onCancel, onApprove, onDecline));
 
     async function onRequest(event) {
         event.preventDefault();
@@ -76,6 +75,28 @@ export async function detailsPage(ctx) {
     async function onCancel(event) {
         event.preventDefault();
         const requestId = pendings.find(x => x._ownerId == userData.id)._id;
+
+        await cancelMembershipRequest(requestId);
+        ctx.page.redirect(teamId);
+    }
+
+    async function onApprove(event) {
+        event.preventDefault();
+        const requestId = event.target.parentElement.dataset.id;
+
+        const request = pendings.find(x => x._id == requestId);
+
+        delete request.user;
+
+        request.status = 'member';
+
+        await approveMembershipRequest(requestId, request);
+        ctx.page.redirect(teamId);
+    }
+
+    async function onDecline(event) {
+        event.preventDefault();
+        const requestId = event.target.parentElement.dataset.id;
 
         await cancelMembershipRequest(requestId);
         ctx.page.redirect(teamId);

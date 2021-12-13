@@ -9,7 +9,7 @@ const template = (teamPromise) => html`
     </article>
 
     <article class="layout narrow user">
-        <div class="pad-small"><a href="#" class="action cta">Create Team</a></div>
+        <div class="pad-small"><a href="/create" class="action cta">Create Team</a></div>
     </article>
 
     ${until(teamPromise, html`<div>Loading&hellip;</div>`)}
@@ -38,7 +38,8 @@ async function loadTeams() {
 
     for (let team of teams) {
         const members = await getTeamMemberships(team._id);
-        team['membersCount'] = members.length;
+
+        team['membersCount'] = members.filter(x => x.status == 'member').length;
     }
 
     return teams.map(teamCard);

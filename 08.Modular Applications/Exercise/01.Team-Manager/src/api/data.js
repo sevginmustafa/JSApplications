@@ -9,11 +9,11 @@ const endpoints = {
     create: '/data/teams',
     request: '/data/members',
     cancelRequest: '/data/members/',
+    approveRequest: '/data/members/',
     edit: '/data/teams/',
     details: '/data/teams/',
     allMemberships: (teamId) => `/data/members?where=teamId%3D%22${teamId}%22&load=user%3D_ownerId%3Ausers`,
 };
-
 
 export async function getAllTeams() {
     return api.get(endpoints.allTeams);
@@ -28,15 +28,19 @@ export async function getTeamMemberships(teamId) {
 }
 
 export async function createTeam(team) {
-    await api.post(endpoints.create, team);
+   return await api.post(endpoints.create, team);
 }
 
 export async function sendMembershipRequest(teamId) {
-    await api.post(endpoints.request, teamId);
+   return await api.post(endpoints.request, teamId);
 }
 
 export async function cancelMembershipRequest(requestId) {
     await api.del(endpoints.cancelRequest + requestId);
+}
+
+export async function approveMembershipRequest(requestId, data) {
+    await api.put(endpoints.approveRequest + requestId, data);
 }
 
 export async function editTeam(teamId, team) {
