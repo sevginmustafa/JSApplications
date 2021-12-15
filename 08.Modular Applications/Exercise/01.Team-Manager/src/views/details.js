@@ -88,8 +88,6 @@ export async function detailsPage(ctx) {
     async function onLeave(event) {
         event.preventDefault();
 
-        onModal('Are you sure you want to leave the team?');
-
         const memberId = members.find(x => x._ownerId == userData.id)._id;
 
         await cancelMembershipRequest(memberId);

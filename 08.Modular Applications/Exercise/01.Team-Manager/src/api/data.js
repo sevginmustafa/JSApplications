@@ -14,6 +14,7 @@ const endpoints = {
     details: '/data/teams/',
     membersCount: (teamId) => `/data/members?where=${encodeURIComponent(`teamId IN ("${teamId}") AND status="member"`)}&count`,
     allMemberships: (teamId) => `/data/members?where=teamId%3D%22${teamId}%22&load=user%3D_ownerId%3Ausers`,
+    userTeams: (userId) => `/data/members?where=_ownerId%3D%22${userId}%22%20AND%20status%3D%22member%22&load=team%3DteamId%3Ateams`
 };
 
 export async function getAllTeams() {
@@ -30,6 +31,10 @@ export async function getMembersCount(teamId) {
 
 export async function getTeamMemberships(teamId) {
     return api.get(endpoints.allMemberships(teamId))
+}
+
+export async function getUserTeams(userId) {
+    return api.get(endpoints.userTeams(userId))
 }
 
 export async function createTeam(team) {

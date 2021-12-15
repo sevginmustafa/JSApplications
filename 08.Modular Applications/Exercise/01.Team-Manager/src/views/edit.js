@@ -36,6 +36,7 @@ export async function editPage(ctx) {
         const name = formData.get('name').trim();
         const logoUrl = formData.get('logoUrl').trim();
         const description = formData.get('description').trim();
+        
         try {
             if (name == '' || logoUrl == '' || description == '') {
                 throw new Error('All fields are required!');

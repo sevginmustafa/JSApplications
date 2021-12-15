@@ -36,11 +36,9 @@ function onAction(event) {
     event.preventDefault();
 
     if (event.target.tagName == 'A') {
-        if (event.target.textContent == 'Yes') {
-            modal.style.display = 'none';
-        }
-        else {
-            modal.style.display = 'none';
+        modal.style.display = 'none';
+        if (event.target.textContent == 'No') {
+            throw new Error();
         }
     }
 }
